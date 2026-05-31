@@ -3,12 +3,12 @@ module mikrotik-exporter
 go 1.25.0
 
 require (
+	github.com/go-routeros/routeros/v3 v3.0.1
 	github.com/miekg/dns v1.1.68
 	github.com/prometheus/client_golang v1.23.2
 	github.com/prometheus/client_model v0.6.2
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.11.1
-	gopkg.in/routeros.v2 v2.0.0-20190905230420-1bbf141cdd91
 	gopkg.in/yaml.v2 v2.4.0
 )
 

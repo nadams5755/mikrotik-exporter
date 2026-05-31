@@ -1,12 +1,7 @@
 package collector
 
 import (
-	"crypto/md5"
 	"crypto/tls"
-	"encoding/hex"
-	"errors"
-	"fmt"
-	"io"
 	"net"
 	"os"
 	"strconv"
@@ -19,7 +14,7 @@ import (
 	"github.com/miekg/dns"
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
-	routeros "gopkg.in/routeros.v2"
+	routeros "github.com/go-routeros/routeros/v3"
 )
 
 const (
@@ -406,43 +401,10 @@ func (c *collector) connect(d *config.Device) (*routeros.Client, error) {
 	log.WithField("device", d.Name).Debug("got client")
 
 	log.WithField("device", d.Name).Debug("trying to login")
-	r, err := client.Run("/login", "=name="+d.User, "=password="+d.Password)
-	if err != nil {
+	if err = client.Login(d.User, d.Password); err != nil {
 		return nil, err
 	}
-	ret, ok := r.Done.Map["ret"]
-	if !ok {
-		// Login method post-6.43 one stage, cleartext and no challenge
-		if r.Done != nil {
-			return client, nil
-		}
-		return nil, errors.New("RouterOS: /login: no ret (challenge) received")
-	}
-
-	// Login method pre-6.43 two stages, challenge
-	b, err := hex.DecodeString(ret)
-	if err != nil {
-		return nil, fmt.Errorf("RouterOS: /login: invalid ret (challenge) hex string received: %s", err)
-	}
-
-	r, err = client.Run("/login", "=name="+d.User, "=response="+challengeResponse(b, d.Password))
-	if err != nil {
-		return nil, err
-	}
-	log.WithField("device", d.Name).Debug("done wth login")
+	log.WithField("device", d.Name).Debug("done with login")
 
 	return client, nil
-
-	//tlsCfg := &tls.Config{
-	//	InsecureSkipVerify: c.insecureTLS,
-	//}
-	//	return routeros.DialTLSTimeout(d.Address+apiPortTLS, d.User, d.Password, tlsCfg, c.timeout)
-}
-
-func challengeResponse(cha []byte, password string) string {
-	h := md5.New()
-	h.Write([]byte{0})
-	_, _ = io.WriteString(h, password)
-	h.Write(cha)
-	return fmt.Sprintf("00%x", h.Sum(nil))
 }

@@ -6,8 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 
-	
-
 	"fmt"
 	"net/http"
 
