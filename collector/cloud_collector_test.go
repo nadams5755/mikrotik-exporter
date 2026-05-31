@@ -8,8 +8,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/stretchr/testify/assert"
-	routeros "gopkg.in/routeros.v2"
-	"gopkg.in/routeros.v2/proto"
+	routeros "github.com/go-routeros/routeros/v3"
+	"github.com/go-routeros/routeros/v3/proto"
 )
 
 func TestCloudMetricDesc(t *testing.T) {
